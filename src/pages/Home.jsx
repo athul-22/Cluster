@@ -199,6 +199,8 @@ const handlePostSubmit = async (data) => {
         status: "success",
         message: "Post created successfully!",
       });
+      window.location.reload();
+
       // Optionally reload the page or update state as needed
     } else {
       const errorData = response.data;
