@@ -20,7 +20,7 @@ const UserListTable = () => {
   const [userList, setUserList] = useState([]);
   const [joinedToday, setJoinedToday] = useState(0);
   const [last30Days, setLast30Days] = useState(0);
-
+  
   useEffect(() => {
     // Fetch user list from the server
     axios
