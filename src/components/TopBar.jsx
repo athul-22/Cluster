@@ -31,12 +31,16 @@ const TopBar = () => {
   return (
     <div className='topbar w-full flex items-center justify-between py-3 md:py-6 px-4 bg-primary'>
       <Link to='/' className='flex gap-2 items-center'>
-        <div className='p-1 md:p-2 bg-[#000000] rounded text-white'>
+        <div className={`p-1 md:p-2 bg-[#000000]  rounded text-white ${theme === 'dark' ? 'text-black bg-[#000000]'  : 'text-white bg-[#000000]'}`}>
           <TbSocial />
         </div>
-        <span className='text-xl md:text-2xl text-[#000000] font-semibold'>
+        {/* <span className='text-xl md:text-2xl text-[#000000] font-semibold'>
+          Cluster
+        </span> */}
+        <span className={`text-xl md:text-2xl ${theme === 'dark' ? 'text-white' : 'text-[#000000]'} font-semibold`}>
           Cluster
         </span>
+       
       </Link>
 
       <form
@@ -64,13 +68,13 @@ const TopBar = () => {
           <IoMdNotificationsOutline />
         </div>
 
-        <div>
+        {/* <div>
           <CustomButton
             onClick={() => dispatch(Logout())}
             title='Log Out'
             containerStyles='text-sm text-ascent-1 px-4 md:px-6 py-1 md:py-2 border border-[#666] rounded-full'
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

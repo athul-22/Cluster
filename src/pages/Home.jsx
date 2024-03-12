@@ -45,6 +45,7 @@ const Home = () => {
   
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+  const uid = user?._id;
 
   useEffect(() => {
     const handleResize = () => {
@@ -393,7 +394,7 @@ const handlePostSubmit = async (data) => {
           New Post
         </Link>
 
-        <Link to="/profile" className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
+        <Link to={`/profile/${uid}`} className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
           <AccountCircleIcon style={{fontSize:'25px',color:'grey'}}/>
           Profile
         </Link>
