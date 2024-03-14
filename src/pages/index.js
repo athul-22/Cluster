@@ -4,5 +4,6 @@ import Register from "./Register";
 import Profile from "./Profile";
 import ResetPassword from "./ResetPassword";
 import Admin from './Admin';
+import Notifications from './Notifications';
 
-export { Login, Home, Register, Profile, ResetPassword ,Admin};
+export { Login, Home, Register, Profile, ResetPassword ,Admin, Notifications};

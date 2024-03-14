@@ -209,15 +209,15 @@ const Register = () => {
   // };
 
   return (
-    <div className="bg-bgColor w-full h-[100vh] flex items-center justify-center p-6">
-      <div className="w-full md:w-2/3 h-fit lg:h-full 2xl:h-5/6 py-8 lg:py-0 flex flex-row-reverse bg-primary rounded-xl overflow-hidden shadow-xl">
+    <div className="bg-bgColor w-full h-full flex items-center justify-center p-3" style={{ overflowY: 'auto'}}>
+      <div style={{marginBottom:'300px'}} className="w-full md:w-2/3 h-fit lg:h-full 2xl:h-5/6 py-8 lg:py-0 flex flex-row-reverse bg-primary rounded-xl overflow-hidden shadow-xl">
         {/* LEFT */}
         <div className="w-full lg:w-1/2 h-full p-10 2xl:px-20 flex flex-col justify-center ">
           <div className="w-full flex gap-2 items-center mb-6">
-            <div className="p-2 bg-[#065ad8] rounded text-white">
+            <div className="p-2 bg-[#000000] rounded text-white">
               <TbSocial />
             </div>
-            <span className="text-2xl text-[#065ad8] " font-semibold>
+            <span className="text-2xl text-[#000000] " font-semibold>
               Cluster
             </span>
           </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { Image, Transformation } from 'cloudinary-react';
 import {
   CustomButton,
   EditProfile,
