@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Home, Login, Profile, Register, ResetPassword,Admin, Notifications } from "./pages";
+import { Home, Login, Profile, Register, ResetPassword,Admin, Notifications ,Ai} from "./pages";
 
 function Layout() {
   const { user } = useSelector((state) => state.user);
@@ -30,6 +30,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='/feed' element={<Home />} />
+        <Route path='/ai' element={<Ai />} />
       </Routes>
     </div>
   );

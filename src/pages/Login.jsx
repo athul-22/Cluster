@@ -23,7 +23,8 @@ const Login = () => {
 
 
   const onSubmit = async (data) => {
-
+    //FOR HOME PAGE WELCOME POSTER LOCALSTORAGE CREATING
+    localStorage.setItem("wel","0")
     setIsSubmitting(true);
   
     try {

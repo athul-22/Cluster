@@ -1,0 +1,20 @@
+.react-spinner-loader {
+    position: relative;
+    width: 64px;
+    height: 64px;
+  }
+  
+  .react-spinner-loader div {
+    transform-origin: 32px 32px;
+    animation: react-spinner-loader 1.2s linear infinite;
+  }
+  
+  @keyframes react-spinner-loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

@@ -19,14 +19,15 @@ import { BsFiletypeGif, BsPersonFillAdd } from "react-icons/bs";
 import { BiImages, BiSolidVideo } from "react-icons/bi";
 import { useForm } from "react-hook-form";
 import { SetPosts } from "../redux/postSlice";
-import {imageDB} from '../firebase/imageDb';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import {v4} from 'uuid';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import CampaignIcon from '@mui/icons-material/Campaign';
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-
+import { imageDB } from "../firebase/imageDb";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import welcome from "../assets/welcome.png";
 
 const Home = () => {
   const { user, edit } = useSelector((state) => state.user);
@@ -38,33 +39,43 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [description, setDescription] = useState("");
-  
-  const [image, setImage] = useState('');
+  const [showImage, setShowImage] = useState(true); //WELCOME IMAGE SHOW
+
+  const [image, setImage] = useState("");
   const [postText, setPostText] = useState("");
-  
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const uid = user?._id;
+  
+
+  useEffect(() => {
+    
+    if (localStorage.getItem("wel") === "1") {
+      setShowImage(false);
+    } else {
+      setShowImage(true);
+      localStorage.setItem("wel", "1");
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
 
   const handleFileChange = (e) => {
     setImage(e.target.files[0]);
@@ -145,83 +156,83 @@ const Home = () => {
     fetchPosts();
   }, []);
 
+  // const storage = firebase.storage();
+  // const storageRef = storage.ref();
 
+  const handlePostSubmit = async (data) => {
+    try {
+      setErrMsg("");
+      setPosting(true);
 
+      // If an image is selected, upload it to Firebase Storage first
+      let imageUrl = null;
 
-// const storage = firebase.storage();
-// const storageRef = storage.ref();
+      if (image) {
+        try {
+          const imageRef = ref(imageDB, `file/${v4()}`);
+          await uploadBytes(imageRef, image);
 
-const handlePostSubmit = async (data) => {
-  try {
-    setErrMsg("");
-    setPosting(true);
-
-    // If an image is selected, upload it to Firebase Storage first
-    let imageUrl = null;
-
-    if (image) {
-      try {
-        const imageRef = ref(imageDB, `file/${v4()}`);
-        await uploadBytes(imageRef, image);
-
-        // Get the download URL of the uploaded image
-        imageUrl = await getDownloadURL(imageRef);
-      } catch (uploadError) {
-        console.error("Error uploading image to Firebase Storage:", uploadError);
-        setErrMsg({
-          message: "Image upload error occurred!",
-          status: "failed",
-        });
-        return;
+          // Get the download URL of the uploaded image
+          imageUrl = await getDownloadURL(imageRef);
+        } catch (uploadError) {
+          console.error(
+            "Error uploading image to Firebase Storage:",
+            uploadError
+          );
+          setErrMsg({
+            message: "Image upload error occurred!",
+            status: "failed",
+          });
+          return;
+        }
       }
-    }
 
-    // Create post data including image URL
-    const postData = {
-      userId: user._id,
-      description: data.description,
-      image: imageUrl,
-    };
-    console.log(postData);
+      // Create post data including image URL
+      const postData = {
+        userId: user._id,
+        description: data.description,
+        image: imageUrl,
+      };
+      console.log(postData);
 
-    console.log(imageUrl);
+      console.log(imageUrl);
 
-    // Post data to your backend
-    const response = await axios.post(
-      "https://cluster-backend.onrender.com/posts/create-post",
-      // "http://localhost:8800/posts/create-post",
-      postData
-    );
+      // Post data to your backend
+      const response = await axios.post(
+        "https://cluster-backend.onrender.com/posts/create-post",
+        // "http://localhost:8800/posts/create-post",
+        postData
+      );
 
-    if (response.status === 201) {
-      setDescription("");
+      if (response.status === 201) {
+        setDescription("");
+        setErrMsg({
+          status: "success",
+          message: "Post created successfully!",
+        });
+        window.location.reload();
+
+        // Optionally reload the page or update state as needed
+      } else {
+        const errorData = response.data;
+        console.error("Failed to create post:", errorData.message);
+        setErrMsg({ message: errorData.message, status: "failed" });
+      }
+    } catch (error) {
+      console.error("An error occurred during post creation:", error.message);
       setErrMsg({
-        status: "success",
-        message: "Post created successfully!",
+        message: "Error occurred during post creation",
+        status: "failed",
       });
-      window.location.reload();
-
-      // Optionally reload the page or update state as needed
-    } else {
-      const errorData = response.data;
-      console.error("Failed to create post:", errorData.message);
-      setErrMsg({ message: errorData.message, status: "failed" });
+    } finally {
+      setPosting(false);
+      setImage(null); // Reset image state
+      setDescription("");
     }
-  } catch (error) {
-    console.error("An error occurred during post creation:", error.message);
-    setErrMsg({
-      message: "Error occurred during post creation",
-      status: "failed",
-    });
-  } finally {
-    setPosting(false);
-    setImage(null); // Reset image state
-    setDescription("");
-  }
-};
+  };
 
   // Handle image input change
- 
+
   // const handlePostSubmit = async (data) => {
   //   try {
   //     setErrMsg("");
@@ -264,10 +275,30 @@ const handlePostSubmit = async (data) => {
   //   }
   // };
 
+  //GRADIENT FOR BOTTOM AI
+  const gradientStyle = {
+    fontSize: "25px",
+    background: "linear-gradient(to right, violet, blue)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  };
+
+  const handleClose = () => {
+    // Set the key in local storage to indicate that the image has been shown
+    localStorage.setItem("hasShownImage", "true");
+    setShowImage(false);
+  };
+
   return (
     <>
       <div className="w-full px-0 lg:px-10 pb-20 2xl:px-40 bg-bgColor lg:rounded-lg h-screen overflow-hidden">
         <TopBar />
+
+        <div className="mt-3 mr-3 ml-3">
+          {showImage && isMobile && (
+            <img src={welcome} style={{ borderRadius: "10px" }} alt="" />
+          )}
+        </div>
 
         <div className="w-full flex gap-2 lg:gap-4 pt-5 pb-10 h-full">
           {/* LEFT */}
@@ -381,30 +412,54 @@ const handlePostSubmit = async (data) => {
           </div>
 
           {isMobile && (
-      <div style={{height:'60px'}} className="fixed bottom-0 left-0 w-full bg-primary p-4 flex justify-around items-center text-blue">
-        {/* Update your bottom navigation items with icons */}
-        <Link to="/" className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
-          <LocalFireDepartmentIcon style={{fontSize:'25px',color:'grey'}}/>
-          Feed
-        </Link>
+            <div
+              style={{ height: "60px" }}
+              className="fixed bottom-0 left-0 w-full bg-primary p-4 flex justify-around items-center text-blue"
+            >
+              {/* Update your bottom navigation items with icons */}
+              <Link
+                to="/"
+                className="text-xl flex flex-col items-center"
+                style={{ fontSize: "15px", color: "grey" }}
+              >
+                <LocalFireDepartmentIcon
+                  style={{ fontSize: "25px", color: "grey" }}
+                />
+                Feed
+              </Link>
 
-        <Link to="/new-post" className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
-          <ControlPointIcon style={{fontSize:'25px',color:'grey'}}/>
-          New Post
-        </Link>
+              <Link
+                to="/ai"
+                className="text-xl flex flex-col items-center"
+                style={{ fontSize: "15px", color: "#f5c000" }}
+              >
+                <AutoAwesomeIcon
+                  style={{ fontSize: "25px", color: "#f5c000" }}
+                />
+                Clu.ai
+              </Link>
 
-        <Link to={`/profile/${uid}`} className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
-          <AccountCircleIcon style={{fontSize:'25px',color:'grey'}}/>
-          Profile
-        </Link>
-       
-        
-        <Link to="/notifications" className="text-xl flex flex-col items-center" style={{fontSize:'15px',color:'grey'}}>
-          <CampaignIcon style={{fontSize:'25px',color:'grey'}}/>
-          Updates
-        </Link>
-      </div>
-    )}
+              <Link
+                to={`/profile/${uid}`}
+                className="text-xl flex flex-col items-center"
+                style={{ fontSize: "15px", color: "grey" }}
+              >
+                <AccountCircleIcon
+                  style={{ fontSize: "25px", color: "grey" }}
+                />
+                Profile
+              </Link>
+
+              <Link
+                to="/notifications"
+                className="text-xl flex flex-col items-center"
+                style={{ fontSize: "15px", color: "grey" }}
+              >
+                <CampaignIcon style={{ fontSize: "25px", color: "grey" }} />
+                Updates
+              </Link>
+            </div>
+          )}
           {/* RIGHT */}
           <div className="hidden w-1/4 h-full lg:flex flex-col gap-8 overflow-y-auto">
             {/* FRIEND REQUEST */}
@@ -488,14 +543,11 @@ const handlePostSubmit = async (data) => {
                         onClick={() => {}}
                       >
                         <BsPersonFillAdd size={20} className="text-[#0f52b6]" />
-
-                        
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-              
             </div>
           </div>
         </div>

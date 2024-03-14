@@ -1,74 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ProfileCard, TopBar } from "../components";
 import notfound from "../assets/404.jpg";
 import Skeleton from "react-loading-skeleton";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const { id } = useParams();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
+  const { id } = useParams(); // Extract the id parameter from the URL
+  // console.log(id) ✅
+  const [viewedUser, setViewedUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const { user } = useSelector((state) => state.user); 
+  const [loggedInUser,setLoggedInUser] = useState("")
+  // console.log(id)
+  // console.log(user._id)
+  
+  useEffect(()=>{
+    setLoggedInUser(user._id);
+  },[])
 
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user); // Use useSelector to get user from Redux store
-
-  const fetchUserDetails = async () => {
-    try {
-      const response = await axios.post(
-        `https://cluster-backend.onrender.com/users/get-user/${id}`
-      );
-      setUserInfo(response.data.user);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
-    fetchUserDetails();
-  }, [id]);
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.post(
+          `https://cluster-backend.onrender.com/users/get-user/${id}`
+        );
+        setViewedUser(response.data.user);
+        setIsFollowing(response.data.user.followers.includes(user._id));
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    if (user && userInfo) {
-      setIsFollowing(user.following && user.following.includes(userInfo._id));
-    }
-  }, [user, userInfo]);
-
-  const handleFollow = async () => {
-    try {
-      await axios.post(`http://localhost:8800/users/follow/${userInfo._id}`);
-      setIsFollowing(true);
-      setUserInfo((prevUserInfo) => ({
-        ...prevUserInfo,
-        followers: [...prevUserInfo.followers, user._id],
-      }));
-    } catch (error) {
-      console.error("Failed to follow user:", error);
-    }
-  };
-
-  const handleUnfollow = async () => {
-    try {
-      await axios.post(`http://localhost:8800/users/unfollow/${userInfo._id}`);
-      setIsFollowing(false);
-      setUserInfo((prevUserInfo) => ({
-        ...prevUserInfo,
-        followers: prevUserInfo.followers.filter((id) => id !== user._id),
-      }));
-    } catch (error) {
-      console.error("Failed to unfollow user:", error);
-    }
-  };
+    fetchUserProfile();
+  }, [id, user]);
 
   return (
     <div className="home w-full px-0 lg:px-10 pb-20 2xl:px-40 bg-bgColor lg:rounded-lg h-screen overflow-hidden">
       <TopBar />
 
+      {/* Loading Skeleton */}
       {loading && (
         <div className="w-full flex flex-col items-center justify-center gap-4 pt-5 pb-10">
           <Skeleton height={100} width={100} circle />
@@ -78,7 +55,8 @@ const Profile = () => {
         </div>
       )}
 
-      {!loading && !userInfo && (
+      {/* User not found */}
+      {!loading && !viewedUser && (
         <div
           className="w-full flex flex-col items-center justify-center gap-2 lg:gap-4 pt-5 pb-10 h-full items-center mb-1 "
           style={{ backgroundColor: "white" }}
@@ -100,15 +78,12 @@ const Profile = () => {
         </div>
       )}
 
-      {!loading && userInfo && (
+      {/* User profile */}
+      {!loading && viewedUser && (
         <div className="w-full flex flex-col items-center justify-center gap-2 lg:gap-4 pt-5 pb-10 h-full sm:mx-10 p-5">
           <div className="w-full md:w-2/3 text-center mx-auto m-4">
-            <ProfileCard
-              user={userInfo}
-              loggedInUser={user} // Pass user instead of loggedInUser
-              onFollow={handleFollow}
-              onUnfollow={handleUnfollow}
-            />
+            {/* Pass loggedInUser as id to ProfileCard */}
+            <ProfileCard user={viewedUser} loggedInUser={loggedInUser}  />
           </div>
           <Link to="/" className="w-full">
             <button

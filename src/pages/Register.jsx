@@ -368,6 +368,7 @@ const Register = () => {
           </p>
         </div>
         {/* RIGHT */}
+
         <div className="hidden w-1/2 h-full lg:flex flex-col items-center justify-center bg-blue">
           <div className="relative w-full flex items-center justify-center">
             <img
@@ -403,6 +404,8 @@ const Register = () => {
           </div>
         </div>
       </div>
+
+      
       {/* BOTTOM DRAWER TO CHOOSE PROFILE PIC */}
       {isDrawerOpen && (
         <div className="fixed inset-0 bg-gray-700 bg-opacity-50 z-50 backdrop-filter backdrop-blur-md">
