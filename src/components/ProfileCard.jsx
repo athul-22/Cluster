@@ -88,7 +88,7 @@ const ProfileCard = ({ user, loggedInUser }) => {
                   {user?.firstName} {user?.lastName}
                 </p>
                 {user?.tick && (
-                  <FaCheckCircle className="ml-1"  style={{color:'#00d498'}}/>
+                  <FaCheckCircle className="ml-1"  style={{color:'#0084ff'}}/>
                 )}
               </div>
               <span className="text-ascent-2">
