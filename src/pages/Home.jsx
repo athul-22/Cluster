@@ -136,6 +136,7 @@ const Home = () => {
 
         // Make a request to fetch posts
         const response = await axios.post(
+          // "https://cluster-backend.onrender.com/posts/"
           "https://cluster-backend.onrender.com/posts/"
         );
 
@@ -200,7 +201,7 @@ const Home = () => {
       // Post data to your backend
       const response = await axios.post(
         "https://cluster-backend.onrender.com/posts/create-post",
-        // "http://localhost:8800/posts/create-post",
+        // "https://cluster-backend.onrender.com/posts/create-post",
         postData
       );
 

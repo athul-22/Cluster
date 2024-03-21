@@ -10,6 +10,8 @@ import Loading from "./Loading";
 import CustomButton from "./CustomButton";
 import { postComments } from "../assets/data";
 import Linkify from "react-linkify";
+import axios from "axios";
+import { FaCheckCircle } from "react-icons/fa";
 
 const ReplyCard = ({ reply, user, handleLike }) => {
   return (
@@ -126,6 +128,8 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
   const [loading, setLoading] = useState(false);
   const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
+  const [isLiked, setIsLiked] = useState(post.likes.includes(user._id));
+  const [likeCount, setLikeCount] = useState(post.likes.length);
 
   const getComments = async () => {
     setReplyComments(0);
@@ -133,7 +137,26 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
     setComments(postComments);
     setLoading(false);
   };
-  const handleLike = async () => {};
+  // const handleLike = async () => {};
+
+  const handleLike = async () => {
+    try {
+      const response = await axios.post("https://cluster-backend.onrender.com/users/like", {
+        postId: post._id,
+        userId: user._id,
+      });
+      console.log(user._id, post._id);
+
+      if (response.status === 200) {
+        setIsLiked(!isLiked);
+        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+
+  const userHasTick = post.userId && post.userId.tick;
 
   return (
     <div className="mb-2 bg-primary p-4 rounded-xl">
@@ -151,13 +174,16 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
         </Link>
 
         <div className="w-full flex justify-between">
-          <div className="">
+          <div className="flex items-center">
             <Link to={"/profile/" + post?.userId?._id}>
               <p className="font-medium text-lg text-ascent-1">
                 {post?.userId?.firstName} {post?.userId?.lastName}
               </p>
             </Link>
-            <span className="text-ascent-2">{post?.userId?.location}</span>
+            {userHasTick && (
+              <FaCheckCircle className="ml-1" style={{ color: "#0084ff" }} />
+            )}
+            <span className="text-ascent-2 ml-1">{post?.userId?.location}</span>
           </div>
 
           <span className="text-ascent-2">
@@ -167,10 +193,20 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
       </div>
 
       <div>
-      <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
-          <a key={key} target='_blank' rel="noopener noreferrer" style={{ color: 'rgb(4, 68, 164)' }} href={decoratedHref.href}>{decoratedText}</a>
-        )}>
-          <p className='text-ascent-2'>
+        <Linkify
+          componentDecorator={(decoratedHref, decoratedText, key) => (
+            <a
+              key={key}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "rgb(4, 68, 164)" }}
+              href={decoratedHref.href}
+            >
+              {decoratedText}
+            </a>
+          )}
+        >
+          <p className="text-ascent-2">
             {showAll === post?._id
               ? post?.description
               : post?.description.slice(0, 300)}
@@ -178,14 +214,14 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
             {post?.description?.length > 301 &&
               (showAll === post?._id ? (
                 <span
-                  className='text-blue ml-2 font-mediu cursor-pointer'
+                  className="text-blue ml-2 font-mediu cursor-pointer"
                   onClick={() => setShowAll(0)}
                 >
                   Show Less
                 </span>
               ) : (
                 <span
-                  className='text-blue ml-2 font-medium cursor-pointer'
+                  className="text-blue ml-2 font-medium cursor-pointer"
                   onClick={() => setShowAll(post?._id)}
                 >
                   Show More
@@ -206,15 +242,25 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
         className="mt-4 flex justify-between items-center px-3 py-2 text-ascent-2
       text-base border-t border-[#66666645]"
       >
-        <p className="flex gap-2 items-center text-base cursor-pointer">
+        {/* <p className="flex gap-2 items-center text-base cursor-pointer">
           {post?.likes?.includes(user?._id) ? (
             <BiSolidLike size={20} color="blue" />
           ) : (
             <BiLike size={20} />
           )}
           {post?.likes?.length} Likes
-        </p>
-
+        </p> */}
+        <button
+          onClick={handleLike}
+          className="flex gap-2 items-center text-base cursor-pointer"
+        >
+          {isLiked ? (
+            <BiSolidLike size={20} color="black" />
+          ) : (
+            <BiLike size={20} />
+          )}
+          {likeCount} Likes
+        </button>
         <p
           className="flex gap-2 items-center text-base cursor-pointer"
           onClick={() => {
@@ -273,7 +319,6 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
 
                 <div className="ml-12">
                   <p className="text-ascent-2">{comment?.comment}</p>
-
                   <div className="mt-2 flex gap-6">
                     <p className="flex gap-2 items-center text-base text-ascent-2 cursor-pointer">
                       {comment?.likes?.includes(user?._id) ? (

@@ -7,7 +7,8 @@ import { NoProfile } from "../assets";
 import axios from "axios";
 import { BsInstagram, BsFacebook } from "react-icons/bs";
 import { FaTwitterSquare } from "react-icons/fa";
-import Modal from "../components/FollowerModel"; 
+import Modal from "../components/FollowerModel";
+import { FaCheckCircle } from "react-icons/fa";
 
 const ProfileCard = ({ user, loggedInUser }) => {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -82,9 +83,14 @@ const ProfileCard = ({ user, loggedInUser }) => {
               className="w-14 h-14 object-cover rounded-full"
             />
             <div className="flex flex-col justify-center">
-              <p className="text-lg font-medium text-ascent-1">
-                {user?.firstName} {user?.lastName}
-              </p>
+              <div className="flex items-center">
+                <p className="text-lg font-medium text-ascent-1">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                {user?.tick && (
+                  <FaCheckCircle className="ml-1"  style={{color:'#00d498'}}/>
+                )}
+              </div>
               <span className="text-ascent-2">
                 {user?.profession ?? "No Profession"}
               </span>
